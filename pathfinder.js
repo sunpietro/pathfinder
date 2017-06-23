@@ -1,43 +1,27 @@
 ((window) => {
     const container = document.querySelector('.pathfinder');
-    const data = window.data;
     const structure = {};
+    const data = [];
 
-    data.forEach(item => {
+    window.data.forEach(item => {
         if (structure[item.overflow]) {
             structure[item.overflow].parent = [...structure[item.overflow].parent, item.id]
         }
 
         structure[item.id] = {
+            id: item.id,
             parent: [],
             overflow: item.overflow
         }
     });
 
-    const noParentsWithOverflow = [];
-
     Object.keys(structure).forEach(key => {
-        if (!structure[key].parent.length && !!structure[key].overflow) {
-            noParentsWithOverflow.push(structure[key]);
-        }
+        data.push(structure[key]);
     });
 
-    console.log('no:parents', noParentsWithOverflow);
+    const findPaths = (item, path) => (!item.overflow) ? [...path, item.id] : findPaths(structure[item.overflow], [...path, item.id]);
+    const noParents = data.filter(item => !item.parent.length);
+    const paths = noParents.map(item => findPaths(item, []));
 
-    const flows = {};
-    const getChildren = (superParentId, parentId, item) => {
-        if (item.overflow) {
-            if (item.overflow === superParentId) {
-                flows[superParentId] = {
-                    [item.overflow]: 0
-                }
-            } else {
-
-            }
-        }
-    };
-
-    noParentsWithOverflow.forEach(item => {
-
-    });
+    console.log('paths', paths.map(path => path.join(',')));
 })(window);
