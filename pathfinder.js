@@ -1,25 +1,35 @@
 ((window) => {
     const container = document.querySelector('.pathfinder');
-    const structure = {};
     const data = [];
+    const buildHash = (hash, item) => {
+        const oveflow = item.overflow;
+        const id = item.id;
 
-    window.data.forEach(item => {
-        if (structure[item.overflow]) {
-            structure[item.overflow].parent = [...structure[item.overflow].parent, item.id]
+        if (overflow) {
+            if (hash[overflow]) {
+                hash[overflow].parent = [...hash[overflow].parent, id]
+            } else {
+                hash[overflow] = {
+                    id: '',
+                    parent: [id],
+                    overflow: ''
+                };
+            }
         }
 
-        structure[item.id] = {
-            id: item.id,
-            parent: [],
-            overflow: item.overflow
+        hash[id] = {
+            id: id,
+            parent: (hash[id] && hash[id].parent.length) ? hash[id].parent : [],
+            overflow: overflow
         }
-    });
 
-    Object.keys(structure).forEach(key => {
-        data.push(structure[key]);
-    });
+        return hash;
+    };
+    const hash = window.data.reduce(buildHash, {});
 
-    const findPaths = (item, path) => (!item.overflow) ? [...path, item.id] : findPaths(structure[item.overflow], [...path, item.id]);
+    Object.keys(structure).forEach(key => data.push(structure[key]));
+
+    const findPaths = (item, path) => (!item.overflow) ? [...path, item.id] : findPaths(hash[item.overflow], [...path, item.id]);
     const noParents = data.filter(item => !item.parent.length);
     const paths = noParents.map(item => findPaths(item, []));
 
